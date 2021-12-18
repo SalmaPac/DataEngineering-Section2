@@ -1,0 +1,120 @@
+PS C:\Users\salma> docker run -d  --name dev-postgres  -e POSTGRES_PASSWORD=Pass2020! -v ${HOME}/postgres-data/:/var/lib/postgresql/data -p 5432:5432 postgres
+b80d3f5afed256edd64b0d331ff7ddc6f7b673255b36c8806f36e31b2378b2f7
+PS C:\Users\salma> echo ${HOME}
+C:\Users\salma
+PS C:\Users\salma> docker ps
+CONTAINER ID   IMAGE      COMMAND                  CREATED          STATUS          PORTS                    NAMES
+b80d3f5afed2   postgres   "docker-entrypoint.s…"   55 seconds ago   Up 53 seconds   0.0.0.0:5432->5432/tcp   dev-postgres
+eb250f0e5daf   postgres   "docker-entrypoint.s…"   14 minutes ago   Up 4 minutes    5432/tcp                 some-postgres
+PS C:\Users\salma> docker exec -it dev-postgres bash
+root@b80d3f5afed2:/# psql -h localhost -U postgres
+psql (14.1 (Debian 14.1-1.pgdg110+1))
+Type "help" for help.
+
+postgres=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+(3 rows)
+
+postgres=# ^C
+postgres=#
+PS C:\Users\salma> docker pull dpage/pgadmin4
+Using default tag: latest
+latest: Pulling from dpage/pgadmin4
+59bf1c3509f3: Already exists
+f2d8dd431001: Pull complete
+1f0a23820872: Pull complete
+80f3c815fedd: Pull complete
+6a2d369d0b49: Pull complete
+72e35256d757: Pull complete
+385de77bf4d9: Pull complete
+6bb95c7964fd: Pull complete
+c7bfcb129eea: Pull complete
+9055580785ee: Pull complete
+297ed8c164c6: Pull complete
+6fcd594095da: Pull complete
+01b1cbeb4a76: Pull complete
+c3800dcdc1fb: Pull complete
+Digest: sha256:9e0204e13c0864488f5cf9f075f741098a4c59923afa9ae5e7e2904c23eabcf0
+Status: Downloaded newer image for dpage/pgadmin4:latest
+docker.io/dpage/pgadmin4:latest
+PS C:\Users\salma> docker run    -p 80:80   -e 'PGADMIN_DEFAULT_EMAIL=user@domain.local'  -e 'PGADMIN_DEFAULT_PASSWORD=SuperSecret' --name dev-pgadmin  -d dpage/pgadmin4
+36225ac911e0ae28d5e9d722daf2850a55cf31f188b36da5d9ad291f2e2774de
+PS C:\Users\salma> docker inspect dev-postgres -f "{{json .NetworkSettings.Networks }}"
+{"bridge":{"IPAMConfig":null,"Links":null,"Aliases":null,"NetworkID":"66418dbf61a61f9bbb1b46c1b0f2a8b3c3de4fde8a44acba1773e076ba2e7d51","EndpointID":"d3855934bcd7bc3cb2a50a450cb790a149876a911398013b55dd129cc98515f7","Gateway":"172.17.0.1","IPAddress":"172.17.0.3","IPPrefixLen":16,"IPv6Gateway":"","GlobalIPv6Address":"","GlobalIPv6PrefixLen":0,"MacAddress":"02:42:ac:11:00:03","DriverOpts":null}}
+
+PS C:\Users\salma> docker exec -it dev-postgres bash
+root@b80d3f5afed2:/# psql -h localhost -U postgres
+psql (14.1 (Debian 14.1-1.pgdg110+1))
+Type "help" for help.
+
+postgres=# CREATE TABLE CAR(
+postgres(# ID INT GENERATED ALWAYS AS IDENTITY,
+postgres(# PRICE BIGINT,
+postgres(# MODEL_NAME TEXT,
+postgres(# MANUFACTURER TEXT,
+postgres(# SERIAL_NO INT,
+postgres(# WEIGHT INT,
+postgres(# PRIMARY KEY(ID)
+postgres(# );
+CREATE TABLE
+postgres=#
+postgres=#
+postgres=#
+postgres=# CREATE TABLE CUSTOMER (
+postgres(# ID INT GENERATED ALWAYS AS IDENTITY,
+postgres(# FNAME TEXT,
+postgres(# LNAME TEXT,
+postgres(# EMAIL TEXT,
+postgres(# PHONENUMBER BIGINT,
+postgres(# PRIMARY KEY(ID)
+postgres(# );
+CREATE TABLE
+postgres=#
+postgres=#
+postgres=# CREATE TABLE DEPARTMENT (
+postgres(#     ID INT GENERATED ALWAYS AS IDENTITY,
+postgres(#     NAME TEXT,
+postgres(# PRIMARY KEY(ID)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE EMPLOYEE (
+postgres(# ID INT GENERATED ALWAYS AS IDENTITY,
+postgres(# FNAME TEXT,
+postgres(# LNAME TEXT,
+postgres(# EMAIL TEXT,
+postgres(# PHONENUMBER VARCHAR(11),
+postgres(# DEPT_ID INT,
+postgres(# PRIMARY KEY(ID),
+postgres(# CONSTRAINT FK_DEPARTMENT
+postgres(#       FOREIGN KEY(DEPT_ID)
+postgres(#   REFERENCES DEPARTMENT(ID)
+postgres(# );
+CREATE TABLE
+postgres=#
+postgres=#
+postgres=# CREATE TABLE TRANSACTION(
+postgres(# ID INT GENERATED ALWAYS AS IDENTITY,
+postgres(# CAR_ID INT,
+postgres(# EMPLOYEE_ID INT,
+postgres(# CUSTOMER_ID INT,
+postgres(# STATUS TEXT,
+postgres(# TRANS_DATE DATE,
+postgres(# PRIMARY KEY(ID),
+postgres(# CONSTRAINT FK_CAR
+postgres(#       FOREIGN KEY(CAR_ID)
+postgres(#   REFERENCES CAR(ID),
+postgres(# CONSTRAINT FK_EMP
+postgres(#       FOREIGN KEY(EMPLOYEE_ID)
+postgres(#   REFERENCES EMPLOYEE(ID),
+postgres(# CONSTRAINT FK_CUST
+postgres(#       FOREIGN KEY(CUSTOMER_ID)
+postgres(#   REFERENCES CUSTOMER(ID)
+postgres(# );
+CREATE TABLE
